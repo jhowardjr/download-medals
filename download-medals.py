@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+import os
 import urllib2
 import sqlite3
 import urllib
@@ -14,6 +14,11 @@ image_tags = soup.table.find_all('img')
 titles = []
 images = []
 links = []
+
+if not os.path.exists('images'):
+	os.makedirs('images')
+
+opener = urllib.URLopener()
 for image_tag in image_tags:
 	schema = image_tag['src'].replace('/thumb','').split('/')
 	schema.pop()
@@ -23,9 +28,9 @@ for image_tag in image_tags:
         image = 'https:'+ '/'.join(schema)
 	titles.append(title)
 	links.append(link)
-	#TODO: Download the actual image files into
-	#a directory off the root
-	images.append(image)
+	filename = image.split('/')[-1]
+	opener.retrieve(image,'images/' + filename)
+	images.append(filename)
 	
 conn = sqlite3.connect('ribbons.sqlite')
 c = conn.cursor()
